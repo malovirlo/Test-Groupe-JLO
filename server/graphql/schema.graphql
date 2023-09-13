@@ -1,0 +1,50 @@
+"A datetime string with format `Y-m-d H:i:s`, e.g. `2018-05-23 13:43:32`."
+scalar DateTime
+    @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\DateTime")
+
+"Indicates what fields are available at the top level of a query operation."
+type Query {
+    tasks: [Task!]! @all
+    task(id: ID @eq): Task @find
+    tags: [Tag!]! @all
+    tag(id: ID @eq): Tag @find
+}
+
+enum TaskStatus {
+    COMPLETED
+    IN_PROGRESS
+}
+
+type Task {
+    id: ID!
+    description: String!
+    status: TaskStatus!
+    tags: [Tag!]! @belongsToMany
+    created_at: DateTime!
+    updated_at: DateTime!
+}
+
+type Tag {
+    id: ID!
+    name: String!
+    color_code: String!
+    tasks: [Task!]! @belongsToMany
+    created_at: DateTime!
+    updated_at: DateTime!
+}
+
+type Mutation {
+    createTask(description: String!, status: TaskStatus!, tag_ids: [ID!]): Task
+        @create
+    updateTask(
+        id: ID!
+        description: String
+        status: TaskStatus
+        tag_ids: [ID!]
+    ): Task @update
+    deleteTask(id: ID!): Task @delete
+
+    createTag(name: String!, color_code: String!): Tag @create
+    updateTag(id: ID!, name: String, color_code: String): Tag @update
+    deleteTag(id: ID!): Tag @delete
+}
