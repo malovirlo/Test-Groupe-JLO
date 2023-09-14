@@ -41,6 +41,27 @@ const ADD_TASK = gql`
     }
 `;
 
+const UPDATE_TASK = gql`
+    mutation UpdateTask(
+        $id: ID!
+        $description: String!
+        $status: TaskStatus!
+        $tag_ids: [ID!]
+    ) {
+        updateTask(
+            id: $id
+            description: $description
+            status: $status
+            tag_ids: $tag_ids
+        ) {
+            id
+            description
+            status
+            created_at
+        }
+    }
+`;
+
 const DELETE_TASK = gql`
     mutation DeleteTask($id: ID!) {
         deleteTask(id: $id) {
@@ -110,8 +131,8 @@ function App() {
         },
     });
 
-    const [deleteAllTasks] = useMutation(DELETE_TASK, {
-        update(cache, { data: { deleteTask } }) {
+    const [deleteTasksByStatus] = useMutation(DELETE_TASKS_BY_STATUS, {
+        update(cache, { data: {} }) {
             const existingData = cache.readQuery<GetTasksData>({
                 query: GET_TASKS,
             });
@@ -120,7 +141,25 @@ function App() {
                     query: GET_TASKS,
                     data: {
                         tasks: existingData.tasks.filter(
-                            (task) => task.id !== deleteTask.id
+                            (task) => task.status !== "COMPLETED"
+                        ),
+                    },
+                });
+            }
+        },
+    });
+
+    const [updateTask] = useMutation(UPDATE_TASK, {
+        update(cache, { data: { updateTask } }) {
+            const existingData = cache.readQuery<GetTasksData>({
+                query: GET_TASKS,
+            });
+            if (existingData) {
+                cache.writeQuery({
+                    query: GET_TASKS,
+                    data: {
+                        tasks: existingData.tasks.map((task) =>
+                            task.id === updateTask.id ? updateTask : task
                         ),
                     },
                 });
@@ -149,27 +188,22 @@ function App() {
         deleteTask({ variables: { id: id } });
     };
 
-    const [deleteTasksByStatus] = useMutation(DELETE_TASKS_BY_STATUS, {
-        update(cache, { data: { deleteTasksByStatus } }) {
-            const existingData = cache.readQuery<GetTasksData>({
-                query: GET_TASKS,
-            });
-            if (existingData) {
-                cache.writeQuery({
-                    query: GET_TASKS,
-                    data: {
-                        tasks: existingData.tasks.filter(
-                            (task) => task.status !== "COMPLETED"
-                        ),
-                    },
-                });
-            }
-        },
-    });
-
     const handleDeleteAllTasks = () => {
         console.log("Deleting all completed tasks");
         deleteTasksByStatus({ variables: { status: "COMPLETED" } });
+    };
+
+    const handleUpdateTask = (task: Task) => {
+        console.log("ID to update:", task.id);
+        console.log("Task to update:", task);
+        updateTask({
+            variables: {
+                id: task.id,
+                status: task.status,
+                description: task.description,
+                created_at: task.created_at,
+            },
+        });
     };
 
     if (loading) return <p>Loading...</p>;
@@ -209,7 +243,17 @@ function App() {
                                 <li className="flex items-center">
                                     {task.description} -{" "}
                                     {formatDate(task.created_at)}
-                                    <FiCircle className="ml-2 cursor-pointer text-green-600" />
+                                    <FiCircle
+                                        onClick={() =>
+                                            handleUpdateTask({
+                                                id: task.id,
+                                                status: "COMPLETED",
+                                                description: task.description,
+                                                created_at: task.created_at,
+                                            })
+                                        }
+                                        className="ml-2 cursor-pointer text-green-600"
+                                    />
                                     <FiEdit className="ml-2 cursor-pointer text-blue-600" />
                                     <FiArchive
                                         onClick={() =>
@@ -258,7 +302,17 @@ function App() {
                                 {task.description} -{" "}
                                 {formatDate(task.created_at)}
                                 <FiCheckCircle className="ml-2 cursor-pointer text-green-600" />
-                                <FiCornerUpLeft className="ml-2 cursor-pointer text-blue-600" />
+                                <FiCornerUpLeft
+                                    onClick={() =>
+                                        handleUpdateTask({
+                                            id: task.id,
+                                            status: "IN_PROGRESS",
+                                            description: task.description,
+                                            created_at: task.created_at,
+                                        })
+                                    }
+                                    className="ml-2 cursor-pointer text-blue-600"
+                                />
                                 <FiArchive
                                     onClick={() => handleDeleteTask(task.id)}
                                     className="ml-2 cursor-pointer text-red-600"
