@@ -52,6 +52,17 @@ const DELETE_TASK = gql`
     }
 `;
 
+const DELETE_TASKS_BY_STATUS = gql`
+    mutation DeleteTasksByStatus($status: TaskStatus!) {
+        deleteTaskByStatus(status: $status) {
+            id
+            status
+            description
+            created_at
+        }
+    }
+`;
+
 interface Task {
     id: string;
     status: string;
@@ -99,6 +110,24 @@ function App() {
         },
     });
 
+    const [deleteAllTasks] = useMutation(DELETE_TASK, {
+        update(cache, { data: { deleteTask } }) {
+            const existingData = cache.readQuery<GetTasksData>({
+                query: GET_TASKS,
+            });
+            if (existingData) {
+                cache.writeQuery({
+                    query: GET_TASKS,
+                    data: {
+                        tasks: existingData.tasks.filter(
+                            (task) => task.id !== deleteTask.id
+                        ),
+                    },
+                });
+            }
+        },
+    });
+
     const [newTaskDescription, setNewTaskDescription] = useState("");
     const [newTaskStatus, setNewTaskStatus] = useState("IN_PROGRESS");
 
@@ -118,6 +147,29 @@ function App() {
     const handleDeleteTask = (id: string) => {
         console.log("ID to delete:", id);
         deleteTask({ variables: { id: id } });
+    };
+
+    const [deleteTasksByStatus] = useMutation(DELETE_TASKS_BY_STATUS, {
+        update(cache, { data: { deleteTasksByStatus } }) {
+            const existingData = cache.readQuery<GetTasksData>({
+                query: GET_TASKS,
+            });
+            if (existingData) {
+                cache.writeQuery({
+                    query: GET_TASKS,
+                    data: {
+                        tasks: existingData.tasks.filter(
+                            (task) => task.status !== "COMPLETED"
+                        ),
+                    },
+                });
+            }
+        },
+    });
+
+    const handleDeleteAllTasks = () => {
+        console.log("Deleting all completed tasks");
+        deleteTasksByStatus({ variables: { status: "COMPLETED" } });
     };
 
     if (loading) return <p>Loading...</p>;
@@ -214,6 +266,14 @@ function App() {
                             </li>
                         )
                     )}
+                    <li>
+                        <button
+                            onClick={handleDeleteAllTasks}
+                            className="ml-2 cursor-pointer text-red-600"
+                        >
+                            Vider la corbeille
+                        </button>
+                    </li>
                 </ul>
             </div>
         </div>

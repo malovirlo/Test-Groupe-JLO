@@ -43,6 +43,7 @@ type Mutation {
         tag_ids: [ID!]
     ): Task @update
     deleteTask(id: ID! @eq): Task @delete
+    deleteTaskByStatus(status: TaskStatus! @eq): [Task!]! @delete
 
     createTag(name: String!, color_code: String!): Tag @create
     updateTag(id: ID!, name: String, color_code: String): Tag @update
