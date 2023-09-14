@@ -1,4 +1,12 @@
-import { useQuery, useMutation, gql } from "@apollo/client";
+import { useQuery, useMutation } from "@apollo/client";
+import { GetTasksData, Task } from "./interfaces/interface";
+import {
+    GET_TASKS,
+    ADD_TASK,
+    UPDATE_TASK,
+    DELETE_TASK,
+    DELETE_TASKS_BY_STATUS,
+} from "./graphql/queries";
 import "./index.css";
 import { useState } from "react";
 import React from "react";
@@ -10,90 +18,6 @@ import {
     FiCircle,
     FiPlusCircle,
 } from "react-icons/fi";
-
-const GET_TASKS = gql`
-    query GetTasks {
-        tasks {
-            id
-            status
-            description
-            created_at
-        }
-    }
-`;
-
-const ADD_TASK = gql`
-    mutation CreateTask(
-        $description: String!
-        $status: TaskStatus!
-        $tag_ids: [ID!]
-    ) {
-        createTask(
-            description: $description
-            status: $status
-            tag_ids: $tag_ids
-        ) {
-            id
-            description
-            status
-            created_at
-        }
-    }
-`;
-
-const UPDATE_TASK = gql`
-    mutation UpdateTask(
-        $id: ID!
-        $description: String!
-        $status: TaskStatus!
-        $tag_ids: [ID!]
-    ) {
-        updateTask(
-            id: $id
-            description: $description
-            status: $status
-            tag_ids: $tag_ids
-        ) {
-            id
-            description
-            status
-            created_at
-        }
-    }
-`;
-
-const DELETE_TASK = gql`
-    mutation DeleteTask($id: ID!) {
-        deleteTask(id: $id) {
-            id
-            status
-            description
-            created_at
-        }
-    }
-`;
-
-const DELETE_TASKS_BY_STATUS = gql`
-    mutation DeleteTasksByStatus($status: TaskStatus!) {
-        deleteTaskByStatus(status: $status) {
-            id
-            status
-            description
-            created_at
-        }
-    }
-`;
-
-interface Task {
-    id: string;
-    status: string;
-    description: string;
-    created_at: string;
-}
-
-interface GetTasksData {
-    tasks: Task[];
-}
 
 function App() {
     const { loading, error, data } = useQuery(GET_TASKS);
