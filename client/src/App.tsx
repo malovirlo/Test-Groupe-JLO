@@ -42,7 +42,7 @@ const ADD_TASK = gql`
 `;
 
 const DELETE_TASK = gql`
-    mutation deleteTask($id: ID!) {
+    mutation DeleteTask($id: ID!) {
         deleteTask(id: $id) {
             id
             status
@@ -81,7 +81,23 @@ function App() {
         },
     });
 
-    const [deleteTask] = useMutation(DELETE_TASK);
+    const [deleteTask] = useMutation(DELETE_TASK, {
+        update(cache, { data: { deleteTask } }) {
+            const existingData = cache.readQuery<GetTasksData>({
+                query: GET_TASKS,
+            });
+            if (existingData) {
+                cache.writeQuery({
+                    query: GET_TASKS,
+                    data: {
+                        tasks: existingData.tasks.filter(
+                            (task) => task.id !== deleteTask.id
+                        ),
+                    },
+                });
+            }
+        },
+    });
 
     const [newTaskDescription, setNewTaskDescription] = useState("");
     const [newTaskStatus, setNewTaskStatus] = useState("IN_PROGRESS");
