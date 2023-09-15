@@ -17,6 +17,8 @@ import {
     FiCircle,
     FiPlusCircle,
 } from "react-icons/fi";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function App() {
     const { loading, error, data } = useQuery(GET_TASKS);
@@ -101,6 +103,7 @@ function App() {
                     status: newTaskStatus,
                 },
             });
+            toast.success("Tâche ajoutée avec succès !");
             setNewTaskDescription("");
             setNewTaskStatus("IN_PROGRESS");
         }
@@ -109,11 +112,13 @@ function App() {
     const handleDeleteTask = (id: string) => {
         console.log("ID to delete:", id);
         deleteTask({ variables: { id: id } });
+        toast.error("Tâche supprimée avec succès !");
     };
 
     const handleDeleteAllTasks = () => {
         console.log("Deleting all completed tasks");
         deleteTasksByStatus({ variables: { status: "COMPLETED" } });
+        toast.error("Tâches supprimées avec succès !");
     };
 
     const handleUpdateTask = (task: Task) => {
@@ -127,6 +132,7 @@ function App() {
                 created_at: task.created_at,
             },
         });
+        toast.info("Tâche mise à jour avec succès !");
     };
 
     if (loading) return <p>Loading...</p>;
@@ -249,6 +255,7 @@ function App() {
                         >
                             Vider la corbeille
                         </button>
+                        <ToastContainer />
                     </li>
                 </ul>
             </div>
