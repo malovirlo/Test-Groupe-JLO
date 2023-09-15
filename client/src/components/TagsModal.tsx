@@ -1,8 +1,8 @@
-import { FormEvent, MouseEvent, useEffect, useState, useRef } from "react";
-import { TagsModalProps, Tag } from "../interfaces/interfaces";
-import { FiPlusCircle } from "react-icons/fi";
-import { useQuery } from "@apollo/client";
-import { GET_TAGS } from "../graphql/queries";
+import { FormEvent, useEffect, useState, useRef } from "react";
+import { TagsModalProps, Tag, GetTagsData } from "../interfaces/interfaces";
+import { FiArchive, FiPlusCircle, FiXCircle } from "react-icons/fi";
+import { useQuery, useMutation } from "@apollo/client";
+import { GET_TAGS, DELETE_TAG } from "../graphql/queries";
 
 function TagsModal({ showModal, setShowModal, taskId }: TagsModalProps) {
     const formRef = useRef<HTMLFormElement>(null);
@@ -40,22 +40,31 @@ function TagsModal({ showModal, setShowModal, taskId }: TagsModalProps) {
         }
     };
 
-    const handleSubmit = (event: FormEvent) => {
-        event.preventDefault();
+    const [deleteTag] = useMutation(DELETE_TAG, {
+        update(cache, { data: { deleteTag } }) {
+            const existingData = cache.readQuery<GetTagsData>({
+                query: GET_TAGS,
+            });
+            if (existingData) {
+                cache.writeQuery({
+                    query: GET_TAGS,
+                    data: {
+                        tags: existingData.tags.filter(
+                            (tag) => tag.id !== deleteTag.id
+                        ),
+                    },
+                });
+            }
+        },
+    });
+
+    const handleDeleteTag = (id: string) => {
+        deleteTag({ variables: { id } });
     };
 
-    const handleSave = (event: MouseEvent) => {
+    const handleSubmit = (event: FormEvent) => {
         event.preventDefault();
-
-        if (name.trim() || colorCode.trim()) {
-            setTags([...tags, { name, color_code: colorCode }]);
-        }
-
-        // Utilisez ici tags pour effectuer votre requête, par exemple :
-        // makeQuery(tags);
-
-        formRef?.current?.submit();
-        setShowModal(false);
+        handleAddTag();
     };
 
     if (loading) return <p>Loading...</p>;
@@ -91,6 +100,14 @@ function TagsModal({ showModal, setShowModal, taskId }: TagsModalProps) {
                                         : "opacity-0 translate-y-4 scale-95"
                                 } transition-all ease-out duration-300 sm:my-8 sm:w-full sm:max-w-lg`}
                             >
+                                <div className="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+                                    <button
+                                        onClick={() => setShowModal(false)}
+                                        type="button"
+                                    >
+                                        <FiXCircle className="w-6 h-6" />
+                                    </button>
+                                </div>
                                 <div className="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
                                     <div className="sm:flex sm:items-start">
                                         <div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
@@ -118,6 +135,14 @@ function TagsModal({ showModal, setShowModal, taskId }: TagsModalProps) {
                                                                 {tag.name}
                                                             </span>
                                                             <FiPlusCircle className="text-green-600 cursor-pointer" />
+                                                            <FiArchive
+                                                                onClick={() =>
+                                                                    handleDeleteTag(
+                                                                        tag.id as string
+                                                                    )
+                                                                }
+                                                                className="text-red-600 cursor-pointer"
+                                                            />
                                                         </li>
                                                     ))}
                                                 </ul>
@@ -127,6 +152,15 @@ function TagsModal({ showModal, setShowModal, taskId }: TagsModalProps) {
                                                 className="flex justify-center items-center w-full mb-4 gap-2"
                                                 ref={formRef}
                                             >
+                                                <input
+                                                    type="color"
+                                                    value={colorCode}
+                                                    onChange={(event) =>
+                                                        setColorCode(
+                                                            event.target.value
+                                                        )
+                                                    }
+                                                />
                                                 <input
                                                     className="border-2 border-gray-300 rounded-md p-1"
                                                     placeholder="Ajouter un tag"
@@ -138,15 +172,6 @@ function TagsModal({ showModal, setShowModal, taskId }: TagsModalProps) {
                                                         )
                                                     }
                                                 />
-                                                <input
-                                                    type="color"
-                                                    value={colorCode}
-                                                    onChange={(event) =>
-                                                        setColorCode(
-                                                            event.target.value
-                                                        )
-                                                    }
-                                                />
                                                 <FiPlusCircle
                                                     onClick={handleAddTag}
                                                     className="inline-block mr-2 w-6 h-6 cursor-pointer text-green-600 hover:text-green-800"
@@ -154,22 +179,6 @@ function TagsModal({ showModal, setShowModal, taskId }: TagsModalProps) {
                                             </form>
                                         </div>
                                     </div>
-                                </div>
-                                <div className="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
-                                    <button
-                                        onClick={handleSave}
-                                        type="button"
-                                        className="inline-flex w-full justify-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 sm:ml-3 sm:w-auto"
-                                    >
-                                        Save
-                                    </button>
-                                    <button
-                                        onClick={() => setShowModal(false)}
-                                        type="button"
-                                        className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
-                                    >
-                                        Cancel
-                                    </button>
                                 </div>
                             </div>
                         </div>

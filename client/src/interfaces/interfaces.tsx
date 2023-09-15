@@ -20,3 +20,7 @@ export interface Tag {
     color_code: string;
     id?: string;
 }
+
+export interface GetTagsData {
+    tags: Tag[];
+}
