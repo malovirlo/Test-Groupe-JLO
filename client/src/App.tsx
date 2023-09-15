@@ -1,10 +1,258 @@
+import { useQuery, useMutation } from "@apollo/client";
+import { GetTasksData, Task } from "./interfaces/interface";
+import {
+    GET_TASKS,
+    ADD_TASK,
+    UPDATE_TASK,
+    DELETE_TASK,
+    DELETE_TASKS_BY_STATUS,
+} from "./graphql/queries";
 import "./index.css";
+import { useState } from "react";
+import React from "react";
+import {
+    FiArchive,
+    FiCheckCircle,
+    FiCornerUpLeft,
+    FiCircle,
+    FiPlusCircle,
+} from "react-icons/fi";
 
 function App() {
+    const { loading, error, data } = useQuery(GET_TASKS);
+    const [addTask] = useMutation(ADD_TASK, {
+        update(cache, { data: { createTask } }) {
+            const existingData = cache.readQuery<GetTasksData>({
+                query: GET_TASKS,
+            });
+            if (existingData) {
+                cache.writeQuery({
+                    query: GET_TASKS,
+                    data: {
+                        tasks: [...existingData.tasks, createTask],
+                    },
+                });
+            }
+        },
+    });
+
+    const [deleteTask] = useMutation(DELETE_TASK, {
+        update(cache, { data: { deleteTask } }) {
+            const existingData = cache.readQuery<GetTasksData>({
+                query: GET_TASKS,
+            });
+            if (existingData) {
+                cache.writeQuery({
+                    query: GET_TASKS,
+                    data: {
+                        tasks: existingData.tasks.filter(
+                            (task) => task.id !== deleteTask.id
+                        ),
+                    },
+                });
+            }
+        },
+    });
+
+    const [deleteTasksByStatus] = useMutation(DELETE_TASKS_BY_STATUS, {
+        update(cache, { data: {} }) {
+            const existingData = cache.readQuery<GetTasksData>({
+                query: GET_TASKS,
+            });
+            if (existingData) {
+                cache.writeQuery({
+                    query: GET_TASKS,
+                    data: {
+                        tasks: existingData.tasks.filter(
+                            (task) => task.status !== "COMPLETED"
+                        ),
+                    },
+                });
+            }
+        },
+    });
+
+    const [updateTask] = useMutation(UPDATE_TASK, {
+        update(cache, { data: { updateTask } }) {
+            const existingData = cache.readQuery<GetTasksData>({
+                query: GET_TASKS,
+            });
+            if (existingData) {
+                cache.writeQuery({
+                    query: GET_TASKS,
+                    data: {
+                        tasks: existingData.tasks.map((task) =>
+                            task.id === updateTask.id ? updateTask : task
+                        ),
+                    },
+                });
+            }
+        },
+    });
+
+    const [newTaskDescription, setNewTaskDescription] = useState("");
+    const [newTaskStatus, setNewTaskStatus] = useState("IN_PROGRESS");
+
+    const handleAddTask = () => {
+        if (newTaskDescription.trim()) {
+            addTask({
+                variables: {
+                    description: newTaskDescription,
+                    status: newTaskStatus,
+                },
+            });
+            setNewTaskDescription("");
+            setNewTaskStatus("IN_PROGRESS");
+        }
+    };
+
+    const handleDeleteTask = (id: string) => {
+        console.log("ID to delete:", id);
+        deleteTask({ variables: { id: id } });
+    };
+
+    const handleDeleteAllTasks = () => {
+        console.log("Deleting all completed tasks");
+        deleteTasksByStatus({ variables: { status: "COMPLETED" } });
+    };
+
+    const handleUpdateTask = (task: Task) => {
+        console.log("ID to update:", task.id);
+        console.log("Task to update:", task);
+        updateTask({
+            variables: {
+                id: task.id,
+                status: task.status,
+                description: task.description,
+                created_at: task.created_at,
+            },
+        });
+    };
+
+    if (loading) return <p>Loading...</p>;
+    if (error) return <p>Error :(</p>;
+
+    function formatDate(dateStr: string) {
+        const date = new Date(dateStr);
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const day = String(date.getDate()).padStart(2, "0");
+        const hours = String(date.getHours()).padStart(2, "0");
+        const minutes = String(date.getMinutes()).padStart(2, "0");
+
+        return `Le ${year}-${month}-${day} à ${hours}:${minutes}`;
+    }
+
+    const inProgressTasks = data.tasks.filter(
+        (task: { status: string }) => "IN_PROGRESS" === task.status
+    );
+    const completedTasks = data.tasks.filter(
+        (task: { status: string }) => "COMPLETED" === task.status
+    );
+
     return (
-        <h1 className="text-3xl font-bold underline text-center text-red-800">
-            Hello world!
-        </h1>
+        <div className="flex gap-5">
+            <div className="flex flex-col items-center mt-4 w-[50%]">
+                <h1 className="uppercase text-green-600">TACHES EN COURS</h1>
+                <ul className="flex flex-col gap-5 m-5">
+                    {inProgressTasks.map(
+                        (task: {
+                            id: string;
+                            status: string;
+                            description: string;
+                            created_at: string;
+                        }) => (
+                            <React.Fragment key={task.id}>
+                                <li className="flex items-center">
+                                    {task.description} -{" "}
+                                    {formatDate(task.created_at)}
+                                    <FiCircle
+                                        onClick={() =>
+                                            handleUpdateTask({
+                                                id: task.id,
+                                                status: "COMPLETED",
+                                                description: task.description,
+                                                created_at: task.created_at,
+                                            })
+                                        }
+                                        className="ml-2 cursor-pointer text-green-600"
+                                    />
+                                    <FiArchive
+                                        onClick={() =>
+                                            handleDeleteTask(task.id)
+                                        }
+                                        className="ml-2 cursor-pointer text-red-600"
+                                    />
+                                </li>
+                            </React.Fragment>
+                        )
+                    )}
+                    <li className="flex items-center gap-2">
+                        <form
+                            onSubmit={(e) => {
+                                e.preventDefault();
+                                handleAddTask();
+                            }}
+                        >
+                            <input
+                                className="border-2 border-gray-300 rounded-md p-1"
+                                placeholder="Ajouter une tâche"
+                                value={newTaskDescription}
+                                onChange={(e) =>
+                                    setNewTaskDescription(e.target.value)
+                                }
+                            />
+                        </form>
+                        <FiPlusCircle
+                            onClick={handleAddTask}
+                            className="inline-block mr-2 w-6 h-6"
+                        />
+                    </li>
+                </ul>
+            </div>
+            <div className="flex flex-col items-center mt-4 w-[50%]">
+                <h1 className="uppercase text-red-600">TACHES TERMINÉES</h1>
+                <ul className="flex flex-col gap-5 m-5">
+                    {completedTasks.map(
+                        (task: {
+                            id: string;
+                            status: string;
+                            description: string;
+                            created_at: string;
+                        }) => (
+                            <li key={task.id} className="flex items-center">
+                                {task.description} -{" "}
+                                {formatDate(task.created_at)}
+                                <FiCheckCircle className="ml-2 text-green-600" />
+                                <FiCornerUpLeft
+                                    onClick={() =>
+                                        handleUpdateTask({
+                                            id: task.id,
+                                            status: "IN_PROGRESS",
+                                            description: task.description,
+                                            created_at: task.created_at,
+                                        })
+                                    }
+                                    className="ml-2 cursor-pointer text-blue-600"
+                                />
+                                <FiArchive
+                                    onClick={() => handleDeleteTask(task.id)}
+                                    className="ml-2 cursor-pointer text-red-600"
+                                />
+                            </li>
+                        )
+                    )}
+                    <li>
+                        <button
+                            onClick={handleDeleteAllTasks}
+                            className="ml-2 cursor-pointer text-red-600"
+                        >
+                            Vider la corbeille
+                        </button>
+                    </li>
+                </ul>
+            </div>
+        </div>
     );
 }
 
