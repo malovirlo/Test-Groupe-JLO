@@ -13,7 +13,6 @@ import React from "react";
 import {
     FiArchive,
     FiCheckCircle,
-    FiEdit,
     FiCornerUpLeft,
     FiCircle,
     FiPlusCircle,
@@ -178,7 +177,6 @@ function App() {
                                         }
                                         className="ml-2 cursor-pointer text-green-600"
                                     />
-                                    <FiEdit className="ml-2 cursor-pointer text-blue-600" />
                                     <FiArchive
                                         onClick={() =>
                                             handleDeleteTask(task.id)
@@ -225,7 +223,7 @@ function App() {
                             <li key={task.id} className="flex items-center">
                                 {task.description} -{" "}
                                 {formatDate(task.created_at)}
-                                <FiCheckCircle className="ml-2 cursor-pointer text-green-600" />
+                                <FiCheckCircle className="ml-2 text-green-600" />
                                 <FiCornerUpLeft
                                     onClick={() =>
                                         handleUpdateTask({
