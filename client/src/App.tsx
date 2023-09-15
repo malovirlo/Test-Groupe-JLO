@@ -157,10 +157,12 @@ function App() {
     );
 
     return (
-        <div className="flex gap-5">
-            <div className="flex flex-col items-center mt-4 w-[50%]">
-                <h1 className="uppercase text-green-600">TACHES EN COURS</h1>
-                <ul className="flex flex-col gap-5 m-5">
+        <div className="flex gap-5 mx-4">
+            <div className="flex flex-col items-center mt-4 w-[50%] border-2 rounded-2xl shadow-md h-[calc(100vh-7rem)]">
+                <h1 className="uppercase text-green-600 text-xl border-b-2 border-green-400 mt-2">
+                    TACHES EN COURS
+                </h1>
+                <ul className="flex flex-col items-center gap-5 m-5 w-full flex-grow overflow-y-auto">
                     {inProgressTasks.map(
                         (task: {
                             id: string;
@@ -169,56 +171,64 @@ function App() {
                             created_at: string;
                         }) => (
                             <React.Fragment key={task.id}>
-                                <li className="flex items-center">
+                                <li className="flex justify-between items-center border-b w-full pb-2 px-4">
                                     {task.description} -{" "}
                                     {formatDate(task.created_at)}
-                                    <FiCircle
-                                        onClick={() =>
-                                            handleUpdateTask({
-                                                id: task.id,
-                                                status: "COMPLETED",
-                                                description: task.description,
-                                                created_at: task.created_at,
-                                            })
-                                        }
-                                        className="ml-2 cursor-pointer text-green-600"
-                                    />
-                                    <FiArchive
-                                        onClick={() =>
-                                            handleDeleteTask(task.id)
-                                        }
-                                        className="ml-2 cursor-pointer text-red-600"
-                                    />
+                                    <div className="flex items-center gap-2">
+                                        <FiCircle
+                                            onClick={() =>
+                                                handleUpdateTask({
+                                                    id: task.id,
+                                                    status: "COMPLETED",
+                                                    description:
+                                                        task.description,
+                                                    created_at: task.created_at,
+                                                })
+                                            }
+                                            className="cursor-pointer text-green-600 min-w-fit"
+                                            title="Marquer la tâche comme terminée"
+                                        />
+                                        <FiPlusCircle
+                                            className="cursor-pointer"
+                                            title="Assigner à un tag"
+                                        />
+                                        <FiArchive
+                                            onClick={() =>
+                                                handleDeleteTask(task.id)
+                                            }
+                                            className="cursor-pointer text-red-600 min-w-fit"
+                                            title="Supprimer la tâche"
+                                        />
+                                    </div>
                                 </li>
                             </React.Fragment>
                         )
                     )}
-                    <li className="flex items-center gap-2">
-                        <form
-                            onSubmit={(e) => {
-                                e.preventDefault();
-                                handleAddTask();
-                            }}
-                        >
-                            <input
-                                className="border-2 border-gray-300 rounded-md p-1"
-                                placeholder="Ajouter une tâche"
-                                value={newTaskDescription}
-                                onChange={(e) =>
-                                    setNewTaskDescription(e.target.value)
-                                }
-                            />
-                        </form>
-                        <FiPlusCircle
-                            onClick={handleAddTask}
-                            className="inline-block mr-2 w-6 h-6"
-                        />
-                    </li>
                 </ul>
+                <form
+                    onSubmit={(e) => {
+                        e.preventDefault();
+                        handleAddTask();
+                    }}
+                    className="flex justify-center items-center w-full mb-4 gap-2"
+                >
+                    <input
+                        className="border-2 border-gray-300 rounded-md p-1"
+                        placeholder="Ajouter une tâche"
+                        value={newTaskDescription}
+                        onChange={(e) => setNewTaskDescription(e.target.value)}
+                    />
+                    <FiPlusCircle
+                        onClick={handleAddTask}
+                        className="inline-block mr-2 w-6 h-6 cursor-pointer text-green-600 hover:text-green-800"
+                    />
+                </form>
             </div>
-            <div className="flex flex-col items-center mt-4 w-[50%]">
-                <h1 className="uppercase text-red-600">TACHES TERMINÉES</h1>
-                <ul className="flex flex-col gap-5 m-5">
+            <div className="flex flex-col items-center mt-4 w-[50%] border-2 rounded-2xl shadow-md h-[calc(100vh-7rem)]">
+                <h1 className="uppercase text-red-600 text-xl border-b-2 border-red-400 mt-2">
+                    TACHES TERMINÉES
+                </h1>
+                <ul className="flex flex-col items-center gap-5 m-5 w-full flex-grow overflow-y-auto">
                     {completedTasks.map(
                         (task: {
                             id: string;
@@ -226,38 +236,45 @@ function App() {
                             description: string;
                             created_at: string;
                         }) => (
-                            <li key={task.id} className="flex items-center">
+                            <li
+                                key={task.id}
+                                className="flex justify-between items-center border-b w-full pb-2 px-4"
+                            >
                                 {task.description} -{" "}
                                 {formatDate(task.created_at)}
-                                <FiCheckCircle className="ml-2 text-green-600" />
-                                <FiCornerUpLeft
-                                    onClick={() =>
-                                        handleUpdateTask({
-                                            id: task.id,
-                                            status: "IN_PROGRESS",
-                                            description: task.description,
-                                            created_at: task.created_at,
-                                        })
-                                    }
-                                    className="ml-2 cursor-pointer text-blue-600"
-                                />
-                                <FiArchive
-                                    onClick={() => handleDeleteTask(task.id)}
-                                    className="ml-2 cursor-pointer text-red-600"
-                                />
+                                <div className="flex items-center gap-2">
+                                    <FiCheckCircle className="text-green-600" />
+                                    <FiCornerUpLeft
+                                        onClick={() =>
+                                            handleUpdateTask({
+                                                id: task.id,
+                                                status: "IN_PROGRESS",
+                                                description: task.description,
+                                                created_at: task.created_at,
+                                            })
+                                        }
+                                        className="cursor-pointer text-blue-600"
+                                        title="Remettre la tâche en cours"
+                                    />
+                                    <FiArchive
+                                        onClick={() =>
+                                            handleDeleteTask(task.id)
+                                        }
+                                        className="cursor-pointer text-red-600"
+                                        title="Supprimer la tâche"
+                                    />
+                                </div>
                             </li>
                         )
                     )}
-                    <li>
-                        <button
-                            onClick={handleDeleteAllTasks}
-                            className="ml-2 cursor-pointer text-red-600"
-                        >
-                            Vider la corbeille
-                        </button>
-                        <ToastContainer />
-                    </li>
                 </ul>
+                <button
+                    onClick={handleDeleteAllTasks}
+                    className="ml-2 cursor-pointer text-red-600 border border-red-600 rounded-full px-4 hover:bg-red-600 hover:text-white mb-4"
+                >
+                    Vider la corbeille
+                </button>
+                <ToastContainer />
             </div>
         </div>
     );
