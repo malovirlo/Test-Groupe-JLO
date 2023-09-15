@@ -2,7 +2,7 @@ import { FormEvent, useEffect, useState, useRef } from "react";
 import { TagsModalProps, Tag, GetTagsData } from "../interfaces/interfaces";
 import { FiArchive, FiPlusCircle, FiXCircle } from "react-icons/fi";
 import { useQuery, useMutation } from "@apollo/client";
-import { GET_TAGS, DELETE_TAG } from "../graphql/queries";
+import { GET_TAGS, ADD_TAG, DELETE_TAG } from "../graphql/queries";
 
 function TagsModal({ showModal, setShowModal, taskId }: TagsModalProps) {
     const formRef = useRef<HTMLFormElement>(null);
@@ -32,11 +32,25 @@ function TagsModal({ showModal, setShowModal, taskId }: TagsModalProps) {
         }
     }, [data]);
 
+    const [addTag] = useMutation(ADD_TAG, {
+        update(cache, { data: { createTag } }) {
+            const existingData = cache.readQuery<GetTagsData>({
+                query: GET_TAGS,
+            });
+            if (existingData) {
+                cache.writeQuery({
+                    query: GET_TAGS,
+                    data: { tags: [...existingData.tags, createTag] },
+                });
+            }
+        },
+    });
+
     const handleAddTag = () => {
         if (name.trim() || colorCode.trim()) {
-            setTags([...tags, { name, color_code: colorCode }]);
-            setName("");
-            setColorCode("#000000");
+            addTag({
+                variables: { name, color_code: colorCode },
+            });
         }
     };
 
@@ -65,6 +79,8 @@ function TagsModal({ showModal, setShowModal, taskId }: TagsModalProps) {
     const handleSubmit = (event: FormEvent) => {
         event.preventDefault();
         handleAddTag();
+        setName("");
+        setColorCode("#000000");
     };
 
     if (loading) return <p>Loading...</p>;
