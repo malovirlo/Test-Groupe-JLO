@@ -72,3 +72,43 @@ export const DELETE_TASKS_BY_STATUS = gql`
         }
     }
 `;
+
+export const GET_TAGS = gql`
+    query GetTags {
+        tags {
+            id
+            name
+            color_code
+        }
+    }
+`;
+
+export const ADD_TAG = gql`
+    mutation CreateTag($name: String!, $color_code: String!) {
+        createTag(name: $name, color_code: $color_code) {
+            id
+            name
+            color_code
+        }
+    }
+`;
+
+export const UPDATE_TAG = gql`
+    mutation UpdateTag($id: ID!, $name: String!, $color_code: String!) {
+        updateTag(id: $id, name: $name, color_code: $color_code) {
+            id
+            name
+            color_code
+        }
+    }
+`;
+
+export const DELETE_TAG = gql`
+    mutation DeleteTag($id: ID!) {
+        deleteTag(id: $id) {
+            id
+            name
+            color_code
+        }
+    }
+`;
