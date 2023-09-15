@@ -118,6 +118,7 @@ function App() {
     const handleDeleteAllTasks = () => {
         console.log("Deleting all completed tasks");
         deleteTasksByStatus({ variables: { status: "COMPLETED" } });
+        toast.error("Tâches supprimées avec succès !");
     };
 
     const handleUpdateTask = (task: Task) => {
