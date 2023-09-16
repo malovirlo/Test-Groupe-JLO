@@ -3,6 +3,8 @@ import { TagsModalProps, Tag, GetTagsData } from "../interfaces/interfaces";
 import { FiArchive, FiPlusCircle, FiXCircle } from "react-icons/fi";
 import { useQuery, useMutation } from "@apollo/client";
 import { GET_TAGS, ADD_TAG, DELETE_TAG } from "../graphql/queries";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function TagsModal({ showModal, setShowModal, taskId }: TagsModalProps) {
     const formRef = useRef<HTMLFormElement>(null);
@@ -51,6 +53,7 @@ function TagsModal({ showModal, setShowModal, taskId }: TagsModalProps) {
             addTag({
                 variables: { name, color_code: colorCode },
             });
+            toast.success("Tag ajouté avec succès");
         }
     };
 
@@ -74,6 +77,7 @@ function TagsModal({ showModal, setShowModal, taskId }: TagsModalProps) {
 
     const handleDeleteTag = (id: string) => {
         deleteTag({ variables: { id } });
+        toast.error("Tag supprimé avec succès");
     };
 
     const handleSubmit = (event: FormEvent) => {
