@@ -164,12 +164,12 @@ function App() {
         <>
             <Header />
 
-            <div className="flex gap-5 mx-4">
-                <div className="flex flex-col items-center mt-4 w-[50%] border-2 rounded-2xl shadow-md h-[calc(100vh-7rem)]">
-                    <h1 className="uppercase text-green-600 text-xl border-b-2 border-green-400 mt-2">
+            <div className="flex flex-col md:flex-row gap-5 mx-4">
+                <div className="flex flex-col items-center mt-4 w-full md:w-[50%] border-2 rounded-2xl shadow-md h-full md:h-[calc(100vh-7rem)]">
+                    <h1 className="uppercase text-green-600 text-xl border-b-2 border-green-400 mt-2 mb-5">
                         TACHES EN COURS
                     </h1>
-                    <ul className="flex flex-col items-center gap-5 m-5 w-full flex-grow overflow-y-auto">
+                    <ul className="flex flex-col items-center px-2 gap-5 w-full flex-grow overflow-y-auto">
                         {inProgressTasks.map(
                             (task: {
                                 id: string;
@@ -178,7 +178,7 @@ function App() {
                                 created_at: string;
                             }) => (
                                 <React.Fragment key={task.id}>
-                                    <li className="flex justify-between items-center border-b w-full pb-2 px-4">
+                                    <li className="flex justify-between items-center border rounded-xl w-full py-2 px-4 break-all">
                                         {task.description} -{" "}
                                         {formatDate(task.created_at)}
                                         <div className="flex items-center gap-2">
@@ -238,11 +238,11 @@ function App() {
                         />
                     </form>
                 </div>
-                <div className="flex flex-col items-center mt-4 w-[50%] border-2 rounded-2xl shadow-md h-[calc(100vh-7rem)]">
-                    <h1 className="uppercase text-red-600 text-xl border-b-2 border-red-400 mt-2">
+                <div className="flex flex-col items-center mt-4 w-full md:w-[50%] border-2 rounded-2xl shadow-md h-full md:h-[calc(100vh-7rem)]">
+                    <h1 className="uppercase text-red-600 text-xl border-b-2 border-red-400 mt-2 mb-5">
                         TACHES TERMINÉES
                     </h1>
-                    <ul className="flex flex-col items-center gap-5 m-5 w-full flex-grow overflow-y-auto">
+                    <ul className="flex flex-col items-center px-2 gap-5 w-full flex-grow overflow-y-auto">
                         {completedTasks.map(
                             (task: {
                                 id: string;
@@ -252,7 +252,7 @@ function App() {
                             }) => (
                                 <li
                                     key={task.id}
-                                    className="flex justify-between items-center border-b w-full pb-2 px-4"
+                                    className="flex justify-between items-center border rounded-xl w-full py-2 px-4 break-all"
                                 >
                                     {task.description} -{" "}
                                     {formatDate(task.created_at)}
