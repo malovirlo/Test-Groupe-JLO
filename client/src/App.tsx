@@ -19,7 +19,6 @@ import {
 } from "react-icons/fi";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import Header from "./components/Header";
 import TagsModal from "./components/TagsModal";
 
 function App() {
@@ -162,10 +161,8 @@ function App() {
 
     return (
         <>
-            <Header />
-
             <div className="flex flex-col md:flex-row gap-5 mx-4">
-                <div className="flex flex-col items-center mt-4 w-full md:w-[50%] border-2 rounded-2xl shadow-md h-full md:h-[calc(100vh-7rem)]">
+                <div className="flex flex-col items-center bg-white mt-4 w-full md:w-[50%] border-2 rounded-2xl shadow-md h-full md:h-[calc(100vh-7rem)]">
                     <h1 className="uppercase text-green-600 text-xl border-b-2 border-green-400 mt-2 mb-5">
                         TACHES EN COURS
                     </h1>
@@ -238,7 +235,7 @@ function App() {
                         />
                     </form>
                 </div>
-                <div className="flex flex-col items-center mt-4 w-full md:w-[50%] border-2 rounded-2xl shadow-md h-full md:h-[calc(100vh-7rem)]">
+                <div className="flex flex-col items-center bg-white mt-4 w-full md:w-[50%] border-2 rounded-2xl shadow-md h-full md:h-[calc(100vh-7rem)]">
                     <h1 className="uppercase text-red-600 text-xl border-b-2 border-red-400 mt-2 mb-5">
                         TACHES TERMINÉES
                     </h1>
