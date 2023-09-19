@@ -6,7 +6,7 @@ import { GET_TAGS, ADD_TAG, DELETE_TAG } from "../graphql/queries";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-function TagsModal({ showModal, setShowModal, taskId }: TagsModalProps) {
+function TagsModal({ showModal, setShowModal }: TagsModalProps) {
     const formRef = useRef<HTMLFormElement>(null);
     const [tags, setTags] = useState<Tag[]>([]);
     const [name, setName] = useState<string>("");
