@@ -219,7 +219,7 @@ function App() {
                             e.preventDefault();
                             handleAddTask();
                         }}
-                        className="flex justify-center items-center w-full mb-4 gap-2"
+                        className="flex justify-center items-center w-full my-4 gap-2"
                     >
                         <input
                             className="border-2 border-gray-300 rounded-md p-1"
