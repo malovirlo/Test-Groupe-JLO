@@ -113,20 +113,16 @@ function App() {
     };
 
     const handleDeleteTask = (id: string) => {
-        console.log("ID to delete:", id);
         deleteTask({ variables: { id: id } });
         toast.error("Tâche supprimée avec succès !");
     };
 
     const handleDeleteAllTasks = () => {
-        console.log("Deleting all completed tasks");
         deleteTasksByStatus({ variables: { status: "COMPLETED" } });
         toast.error("Tâches supprimées avec succès !");
     };
 
     const handleUpdateTask = (task: Task) => {
-        console.log("ID to update:", task.id);
-        console.log("Task to update:", task);
         updateTask({
             variables: {
                 id: task.id,

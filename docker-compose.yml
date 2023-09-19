@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+  client:
+    volumes: 
+      - ./client:/app
+    build: ./client
+    ports:
+      - "3000:3000"
+    depends_on:
+      - server
+
+  server:
+    build: ./server
+    volumes:
+      - ./server:/var/www/html
+    networks:
+      - default
+    depends_on: 
+      - db
+    environment:
+      - DB_CONNECTION=mysql
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_DATABASE=JLOtest
+      - DB_USERNAME=root
+      - DB_PASSWORD=chienguyen
+  nginx:
+    build: ./nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - ./server:/var/www/server
+    networks:
+      - default
+    depends_on:
+      - server
+
+  db:
+    image: mariadb:latest
+    environment:
+      - MYSQL_ROOT_PASSWORD=chienguyen
+      - MYSQL_DATABASE=JLOtest
+    networks:
+      - default
+
+
+networks:
+  default:
+    driver: bridge
