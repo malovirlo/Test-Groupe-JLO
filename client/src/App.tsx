@@ -113,20 +113,16 @@ function App() {
     };
 
     const handleDeleteTask = (id: string) => {
-        console.log("ID to delete:", id);
         deleteTask({ variables: { id: id } });
         toast.error("Tâche supprimée avec succès !");
     };
 
     const handleDeleteAllTasks = () => {
-        console.log("Deleting all completed tasks");
         deleteTasksByStatus({ variables: { status: "COMPLETED" } });
         toast.error("Tâches supprimées avec succès !");
     };
 
     const handleUpdateTask = (task: Task) => {
-        console.log("ID to update:", task.id);
-        console.log("Task to update:", task);
         updateTask({
             variables: {
                 id: task.id,
@@ -219,7 +215,7 @@ function App() {
                             e.preventDefault();
                             handleAddTask();
                         }}
-                        className="flex justify-center items-center w-full mb-4 gap-2"
+                        className="flex justify-center items-center w-full my-4 gap-2"
                     >
                         <input
                             className="border-2 border-gray-300 rounded-md p-1"
