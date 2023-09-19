@@ -17,6 +17,4 @@ RUN composer install
 
 RUN chmod -R 777 /var/www/server
 
-RUN php artisan key:generate
-
 CMD ["php-fpm"]
