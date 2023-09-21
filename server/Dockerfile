@@ -16,4 +16,6 @@ COPY . .
 
 RUN composer install
 
+RUN chmod -R 777 /var/www/server/
+
 CMD ["php-fpm"]
