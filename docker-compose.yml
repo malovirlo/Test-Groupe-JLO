@@ -31,6 +31,7 @@ services:
       - default
     volumes:
       - ./nginx/logs:/var/log/nginx
+      - ./server:/var/www/server
     depends_on:
       - server
 
