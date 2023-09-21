@@ -23,7 +23,7 @@ Suivez ces étapes pour configurer le projet sur votre machine locale.
    - Accéder au dossier server `server`
    - Créer un fichier `.env` en copiant le fichier `.env.example`
    - Remplir avec les infos suivantes :
-   - `DB_CONNECTION=mysql
+   - `DB_CONNECTION=mysql <br>
      DB_HOST=db
      DB_PORT=3306
      DB_DATABASE=JLOtest
@@ -41,4 +41,4 @@ Suivez ces étapes pour configurer le projet sur votre machine locale.
     php artisan migrate
     ```
 
-🎉 Félicitations!
+## 🎉 Félicitations!
