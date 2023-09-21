@@ -1,20 +1,19 @@
-FROM php:8.1.18-fpm
-
-RUN docker-php-ext-install pdo_mysql
-
-RUN apt-get update && apt-get install -y \
-    libzip-dev \
-    zip \
-    && docker-php-ext-install zip
-
-COPY . /var/www/server
-
-COPY --from=composer /usr/bin/composer /usr/bin/composer
+FROM php:8.1-fpm
 
 WORKDIR /var/www/server
 
-RUN composer install
+RUN apt-get update && apt-get install -y \
+    libzip-dev \
+    curl \
+    zip \
+    && docker-php-ext-install pdo_mysql
 
-RUN chmod -R 777 /var/www/server
+COPY composer.json .
+
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+
+COPY . .
+
+RUN composer install
 
 CMD ["php-fpm"]

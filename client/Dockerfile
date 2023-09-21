@@ -1,17 +1,21 @@
-FROM node:latest
+FROM node:latest AS builder
 
-WORKDIR /app
+WORKDIR /var/www/client
 
-COPY package*.json ./
+COPY package*.json .
 
-RUN npm install
+RUN npm ci
 
 COPY . .
 
 RUN npm run build
 
-RUN npm install -g serve
+FROM nginx:latest
+
+COPY --from=builder /var/www/client /var/www/client
+
+COPY default.conf /etc/nginx/conf.d/default.conf
 
 EXPOSE 80
 
-CMD [ "serve", "-s", "dist", "-p", "80" ]
+CMD ["nginx", "-g", "daemon off;"]
